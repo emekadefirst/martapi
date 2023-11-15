@@ -1,9 +1,9 @@
 from rest_framework import serializers
-from models.wallet_model import Wallet
+from api.models.buyer_model import Wallet
 
 
 
 class WalletSerializer(serializers.ModelSerializer):
     class Meta:
         model = Wallet
-        field = "__all__"
+        fields = "__all__"
