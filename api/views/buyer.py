@@ -1,4 +1,5 @@
 from api.dependencies import *
+from django.http import Http404
 from django.contrib.auth.models import User
 from rest_framework.authtoken.models import Token
 
@@ -58,3 +59,30 @@ class LoginView(APIView):
         serializer = UserSerializer(user)  # Use the UserSerializer
 
         return Response({'success': True, 'token': token.key, 'user': serializer.data})
+
+
+
+class BuyerDetailView(APIView):
+    def get_object(self, user_id):
+        try:
+            return Buyer.objects.get(user_id=user_id)
+        except Buyer.DoesNotExist:
+            raise Http404
+
+    def get(self, request, user_id, format=None):
+        buyer = self.get_object(user_id)
+        serializer = BuyerSerializer(buyer)
+        return Response(serializer.data)
+
+    def put(self, request, user_id, format=None):
+        buyer = self.get_object(user_id)
+        serializer = BuyerSerializer(buyer, data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    def delete(self, request, user_id, format=None):
+        buyer = self.get_object(user_id)
+        buyer.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
