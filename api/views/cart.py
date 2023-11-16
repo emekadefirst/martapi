@@ -2,7 +2,7 @@ from api.dependencies import *
 
 
 class CartView(APIView):
-    permission_classes = [IsAuthenticated]
+    permission_classes = ([SessionAuthentication, TokenAuthentication, IsAuthenticated])
     def get(self, request):
         # Get all items in the cart for the authenticated user
         cart = Cart.objects.filter(user=request.user)

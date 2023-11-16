@@ -58,6 +58,7 @@ class LoginView(APIView):
 
 
 class BuyerDetailView(APIView):
+    permission_classes = ([SessionAuthentication, TokenAuthentication, IsAuthenticated])
     def get_object(self, user_id):
         try:
             return Buyer.objects.get(user_id=user_id)
@@ -84,6 +85,7 @@ class BuyerDetailView(APIView):
 
 
 class DeliveryAddressView(APIView):
+    permission_classes = ([SessionAuthentication, TokenAuthentication, IsAuthenticated])
     def post(self, request):
         # Assuming you are sending JSON data with the registered user's ID
         user_id = request.data.get('user_id')
