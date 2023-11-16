@@ -23,11 +23,7 @@ class RegisterUserView(APIView):
             # Create the Buyer instance associated with the user
             buyer = Buyer(
                 user=user,
-                phone_number=data['phone_number'],
-                street_address=data['street_address'],
-                land_mark=data['land_mark'],
-                LGA=data['LGA'],
-                state=data['state']
+                phone_number=data['phone_number']
             )
             buyer.save()
 
@@ -39,10 +35,8 @@ class RegisterUserView(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-
-
-
 class LoginView(APIView):
+    serializer = BuyerSerializer
     def post(self, request):
         email = request.data.get('email')
         password = request.data.get('password')
@@ -56,10 +50,11 @@ class LoginView(APIView):
             return Response({'error': 'Invalid email or password'}, status=status.HTTP_400_BAD_REQUEST)
 
         token, created = Token.objects.get_or_create(user=user)
-        serializer = UserSerializer(user)  # Use the UserSerializer
+        
+        serializer = BuyerSerializer()  
 
         return Response({'success': True, 'token': token.key, 'user': serializer.data})
-
+    
 
 
 class BuyerDetailView(APIView):
@@ -86,3 +81,19 @@ class BuyerDetailView(APIView):
         buyer = self.get_object(user_id)
         buyer.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+class DeliveryAddressView(APIView):
+    def post(self, request):
+        # Assuming you are sending JSON data with the registered user's ID
+        user_id = request.data.get('user_id')
+        user = User.objects.get(pk=user_id)
+
+        # Validate and parse the data using the serializer
+        serializer = DeliveryAddressSerializer(data=request.data)
+        if serializer.is_valid():
+            # Save the delivery address with the associated user
+            serializer.save(buyer=user)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

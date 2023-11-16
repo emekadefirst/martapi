@@ -17,10 +17,8 @@ class Product(models.Model):
     category = models.ForeignKey(Category, on_delete=models.CASCADE)
     price = models.IntegerField()
     quantity = models.IntegerField()
-    image = models.FileField(upload_to="Product-img-store")
     date_created = models.DateTimeField(auto_now_add=True)
     product_description = models.TextField(default='')
-    
 
     class Meta:
         permissions = [
@@ -33,3 +31,10 @@ class Product(models.Model):
 
     def __str__(self):
         return self.name
+
+class ProductImage(models.Model):
+    product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='images')
+    image = models.ImageField(upload_to="Product-img-store")
+
+    def __str__(self):
+        return f"Image for {self.product.name}"
